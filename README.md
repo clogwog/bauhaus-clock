@@ -35,7 +35,7 @@ The screensaver is macOS only (macOS 13 Ventura or later, Apple Silicon and Inte
 - Optional night dimming from 10pm–7am (off by default; the clock fades to 45% opacity).
 - Burn-in drift (on by default).
 - Settings remembered in the browser.
-- Open settings with the gear, or the `s` or `,` keys. Escape closes the panel.
+- Open settings with the gear, or the `s` or `,` keys. Escape, or a click outside the panel, closes it.
 - One self-contained offline HTML file.
 
 ### Screensaver

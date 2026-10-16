@@ -121,7 +121,7 @@ Object.keys(L).forEach(k=>lang.add(new Option(L[k][0],k)));
 ['Europe/London','America/New_York','America/Los_Angeles','Asia/Tokyo','Asia/Shanghai','Asia/Dubai','Europe/Paris','Europe/Berlin','Europe/Amsterdam','Australia/Melbourne','Asia/Singapore','America/Sao_Paulo'].forEach(z=>tz2.add(new Option(z.replace(/_/g,' '),z)));
 ['seconds','numerals','night','burnin','sysfont','lume'].forEach(k=>document.getElementById(k).onchange=e=>{S[k]=e.target.checked;apply()});
 size.oninput=e=>{S.size=+e.target.value;apply()};lang.onchange=e=>{S.lang=e.target.value;apply()};tz2.onchange=e=>{S.tz2=e.target.value;apply()};
-gear.onclick=()=>panel.classList.toggle('open');addEventListener('keydown',e=>{if(e.key==='Escape')panel.classList.remove('open');if(e.key===','||e.key==='s')panel.classList.toggle('open')});
+gear.onclick=()=>panel.classList.toggle('open');document.addEventListener('pointerdown',e=>{if(panel.classList.contains('open')&&!panel.contains(e.target)&&!gear.contains(e.target))panel.classList.remove('open')});addEventListener('keydown',e=>{if(e.key==='Escape')panel.classList.remove('open');if(e.key===','||e.key==='s')panel.classList.toggle('open')});
 function parts(tz){const d=new Date();if(!tz)return{h:d.getHours(),m:d.getMinutes(),s:d.getSeconds(),ms:d.getMilliseconds()};
  const p=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:tz,hour:'numeric',minute:'numeric',second:'numeric',hourCycle:'h23'}).formatToParts(d).map(x=>[x.type,+x.value]));return{h:p.hour,m:p.minute,s:p.second,ms:d.getMilliseconds()}}
 // AM/PM badge for dual-clock labels: Bauhaus sun (circle + 8 short rays) for AM, crescent moon for PM

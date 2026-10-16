@@ -28,6 +28,7 @@ body.nofont{font-family:Georgia,serif}
 .tg{appearance:none;width:38px;height:22px;border-radius:11px;background:#ccc;position:relative;cursor:pointer;transition:.2s}
 .tg:checked{background:#34c759}.tg:before{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.3)}.tg:checked:before{left:18px}
 select,input[type=range]{width:100%;font:inherit}
+#src{display:block;margin:16px -18px -18px;padding:12px 18px;border-top:1px solid rgba(0,0,0,.08);font-size:11px;color:#777;text-decoration:none;text-align:center;letter-spacing:.02em}#src:hover{color:#111}
 </style></head><body>
 <div id="stage"></div>
 <button id="gear" aria-label="Settings">⚙</button>
@@ -46,6 +47,7 @@ select,input[type=range]{width:100%;font:inherit}
  <div class="row"><span data-i="sysf">System font</span><input type="checkbox" class="tg" id="sysfont"></div>
  <div class="row"><span data-i="lume">Lume</span><input type="checkbox" class="tg" id="lume"></div>
  <h3 data-i="lang">Language</h3><select id="lang"></select>
+ <a id="src" href="https://github.com/clogwog/bauhaus-clock" target="_blank" rel="noopener" data-i="src">Source on GitHub · includes a macOS screensaver</a>
 </div>
 <script>
 const DIALS={White:['#ffffff','#111','#cfcfcf','#e8452c'],Turquoise:['#d5efef','#10302f','#9fc9c8','#e8452c'],Glacier:['#e3edf2','#14232b','#b3c6cf','#e8452c'],Ocean:['#1f4e6b','#f2f5f7','#5f88a0','#ffb02e'],Tennis:['#dfe86a','#1d2108','#b2ba3c','#1f5fd1'],'Signal Blue':['#1e5bd6','#fff','#6c95e6','#ffcf2e'],Salmon:['#f6a48f','#2a120c','#e07f69','#fff'],Yellow:['#f7d33a','#1d1700','#d4ad18','#e8452c'],Beige:['#ece3d3','#2b241a','#c9bca6','#e8452c'],Pistachio:['#cfe3c0','#18240f','#a3be8f','#e8452c'],Lavender:['#d9d2f0','#1c1630','#ada3d4','#e8452c'],Rose:['#f4cfd6','#2c1218','#d9a2ad','#c8243c'],'Sky Blue':['#bfe0f6','#0e2433','#8dbfe0','#e8452c'],Cream:['#f7f1e1','#29241a','#d8cfb6','#e8452c'],Slate:['#3b4248','#eef0f2','#6b747c','#ff8a3d'],Noir:['#1b1b1b','#f2f2f2','#3c3c3c','#ff5a36']};
@@ -61,7 +63,7 @@ tr:['Türkçe','Kadran','Mekanizma','Stil','Saatler','İkinci saat dilimi','Boyu
 ar:['العربية','المينا','الحركة','النمط','الساعات','منطقة زمنية ثانية','الحجم','الخيارات','عقرب الثواني','الأرقام','تعتيم ليلي','حماية الشاشة','خط النظام','اللغة','كوارتز','ميكانيكية','رقمية','كلاسيكي','مدمج','واحدة','اثنتان']};
 const KEYS=['dial','move','style','clocks','tz2','size','opts','secs','nums','auto','burn','sysf','lang'];
 const DEF={dial:'Noir',movement:'Digital',layout:'Classic',count:1,tz2:'Europe/London',size:70,seconds:true,numerals:true,night:false,burnin:true,sysfont:true,lume:false,lang:'en'};
-const LUME_L={en:'Lume (glow)',fr:'Luminescence',de:'Leuchtmasse',es:'Luminiscencia',it:'Luminescenza',ja:'夜光',zh:'夜光',ru:'Люминесценция',tr:'Işıma',ar:'إضاءة ليلية'};
+const SRC_L={en:'Source on GitHub · includes a macOS screensaver',fr:'Code source sur GitHub · avec un économiseur d’écran macOS',de:'Quellcode auf GitHub · inkl. macOS-Bildschirmschoner',es:'Código en GitHub · incluye salvapantallas para macOS',it:'Sorgente su GitHub · include uno screensaver per macOS',ja:'GitHub でソースを見る · macOS スクリーンセーバー付き',zh:'GitHub 源代码 · 含 macOS 屏幕保护程序',ru:'Исходный код на GitHub · есть заставка для macOS',tr:'GitHub’da kaynak kodu · macOS ekran koruyucusu dahil',ar:'المصدر على GitHub · يتضمن شاشة توقف لنظام macOS'},LUME_L={en:'Lume (glow)',fr:'Luminescence',de:'Leuchtmasse',es:'Luminiscencia',it:'Luminescenza',ja:'夜光',zh:'夜光',ru:'Люминесценция',tr:'Işıma',ar:'إضاءة ليلية'};
 let S=Object.assign({},DEF,JSON.parse(localStorage.getItem('bauhausClock')||'{}'));
 const save=()=>localStorage.setItem('bauhausClock',JSON.stringify(S));
 const NS='http://www.w3.org/2000/svg';
@@ -110,7 +112,7 @@ function build(){const st=document.getElementById('stage');st.innerHTML='';const
   if(n==2){const p=document.createElement('div');p.className='cap';p.dataset.tz=i?S.tz2:'';const nm=document.createElement('span');nm.textContent=i?S.tz2.split('/').pop().replace(/_/g,' '):Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop().replace(/_/g,' ');p.appendChild(nm);const ap=document.createElement('span');ap.className='ap';p.appendChild(ap);w.appendChild(p)}st.appendChild(w)}}
 function apply(){const [bg,ink,idx,sec]=S.lume?['#020405','#1a5560','#2ee6f0','#1f8f99']:DIALS[S.dial];const r=document.documentElement.style;r.setProperty('--bg',bg);r.setProperty('--ink',ink);r.setProperty('--idx',idx);r.setProperty('--sec',sec);
  document.body.classList.toggle('nofont',!S.sysfont);document.body.classList.toggle('lume',S.lume);document.body.classList.toggle('grain',S.dial==='Noir'&&!S.lume);document.documentElement.lang=S.lang;
- const t=L[S.lang];document.querySelectorAll('[data-i]').forEach(e=>e.textContent=e.dataset.i==='lume'?LUME_L[S.lang]:t[KEYS.indexOf(e.dataset.i)+1]);
+ const t=L[S.lang];document.querySelectorAll('[data-i]').forEach(e=>e.textContent=e.dataset.i==='lume'?LUME_L[S.lang]:e.dataset.i==='src'?SRC_L[S.lang]:t[KEYS.indexOf(e.dataset.i)+1]);
  seg('movement',['Quartz','Mechanical','Digital'],[14,15,16]);seg('layout',['Classic','Compact'],[17,18]);seg('count',[1,2],[19,20]);
  document.querySelectorAll('#dials button').forEach(b=>b.classList.toggle('on',b.title===S.dial));
  ['seconds','numerals','night','burnin','sysfont','lume'].forEach(k=>document.getElementById(k).checked=S[k]);

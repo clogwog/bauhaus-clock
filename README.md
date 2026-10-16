@@ -109,7 +109,3 @@ Michroma, SIL OFL; used by the web clock's numerals, bundled for the screensaver
 ## Inspiration
 
 This project was inspired by the [Bauhaus Clock](https://bauhausclock.com/) app, a commercial Mac screensaver and iPhone/iPad app. This is an independent fan recreation, not affiliated with it, and uses none of its assets. The later watch-style details were inspired by reference photos.
-
-## Deploy
-
-See [DEPLOY.md](DEPLOY.md).

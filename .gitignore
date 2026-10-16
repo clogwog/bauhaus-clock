@@ -1,0 +1,13 @@
+# build outputs
+screensaver/harness
+screensaver/*.dylib
+screensaver/BauhausClock.saver/
+screensaver/*.png
+!screensaver/thumbnail.png
+!screensaver/thumbnail@2x.png
+*.o
+.DS_Store
+# never commit credentials
+*.netrc
+netrc
+.secrets/

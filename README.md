@@ -24,7 +24,10 @@ The screensaver is macOS only (macOS 13 Ventura or later, Apple Silicon and Inte
 - Lume mode: cyan glow on a black dial.
 - Optional hour numerals and seconds hand (both on by default).
 - Size slider.
-- Dual clock with a second time zone.
+- Dual clock with a second time zone. Each location label is followed by a small sun and AM, or a crescent moon and PM, for that clock's time zone (cyan in Lume).
+
+  ![Dual clock with AM and PM](screenshots/dual-ampm.png)
+
 - Optional night dimming from 10pm–7am (off by default; the clock fades to 45% opacity).
 - Burn-in drift (on by default).
 - Settings remembered in the browser.

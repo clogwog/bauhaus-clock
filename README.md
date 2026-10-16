@@ -28,7 +28,7 @@ The screensaver is macOS only (macOS 13 Ventura or later, Apple Silicon and Inte
 
   ![Diver dial](screenshots/web-diver.png)
 
-- Pilot: a black dial with a cream slide-rule bezel (full outer and inner rings, with a log scale and time markings), gilt hour numerals, and three subdials. The seconds subdial at 9 runs; the subdials at 3 and 6 are decorative. The hands are aged-cream lume batons with a dark outline. With Lume on, the face goes dark and the numerals, 12 o'clock triangle, and hand strips glow a warm yellow-green.
+- Pilot: a black dial with a cream slide-rule bezel (full outer and inner rings, with a log scale and time markings), generic gold-outline pilot wings, gilt hour numerals, and three subdials. The seconds subdial at 9 runs; the subdials at 3 and 6 are decorative. The hands are aged-cream lume batons with a dark outline. With Lume on, the face goes dark and the numerals, 12 o'clock triangle, and hand strips glow a warm yellow-green.
 
   ![Pilot dial](screenshots/web-pilot.png)
 - Three movements. Quartz ticks with a slight overshoot, Mechanical steps at eight beats a second, and Digital sweeps the seconds hand smoothly (Digital is the default). Hour and minute hands sweep on every movement.
@@ -51,9 +51,9 @@ The screensaver is macOS only (macOS 13 Ventura or later, Apple Silicon and Inte
 
 ### Screensaver
 
-Version 1.17. Native macOS `.saver` bundle (Core Graphics drawing, no web view).
+Version 1.18. Native macOS `.saver` bundle (Core Graphics drawing, no web view).
 
-- All 19 dials, including Chronograph, Diver and Pilot. Those three have dark lume views (Chronograph and Diver glow green; Pilot glows a warm yellow-green). The other dials use the cyan lume.
+- All 19 dials, including Chronograph, Diver and Pilot. The Pilot face has generic gold-outline wings. Those three have dark lume views (Chronograph and Diver glow green; Pilot glows a warm yellow-green). The other dials use the cyan lume.
 - Quartz, Mechanical and Digital movements (Digital is the default). Quartz ticks with a slight overshoot, Mechanical steps at eight beats a second, and Digital sweeps the seconds hand.
 - A seconds-hand toggle (on by default). Classic and Compact styles; Compact leaves the minute ticks off the colour dials.
 - Size is 2/3, 1/2, or 1/3 of the screen height (2/3 by default). It drifts at about 30 pixels a second on a 1080p display. Bounce is on by default; turning it off holds the clock in the centre.
@@ -93,7 +93,7 @@ numerals, night mode, burn-in protection, fonts, **Lume (glow)** and language (1
 
 ## Screensaver
 
-Version 1.17. Requirements: macOS 13+, Xcode command-line tools.
+Version 1.18. Requirements: macOS 13+, Xcode command-line tools.
 
 ```sh
 cd screensaver

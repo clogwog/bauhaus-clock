@@ -265,7 +265,8 @@ func pilotStatic(_ p: Pen, dark: Bool) {
         p.text("KM", 5.2, -73.6, size: 3, color: W)
         let box = CGPath(rect: CGRect(x: -4.4, y: -70.6, width: 8.8, height: 4.4), transform: nil); p.fill(box, hex("#0b0b0c")); p.stroke(box, W, 0.35)
         p.text("MPH", 0, -67.1, size: 3.2, color: W, font: "HelveticaNeue-Bold")
-        p.text("PILOT", 0, -24, size: 4, color: sw, kern: 2)
+        pilotWings(p)
+        p.text("PILOT", 0, -19.5, size: 4, color: sw, kern: 2)
     }
     let tri = p.poly([(0, -86), (-2.6, -77), (2.6, -77)])
     if dark { p.glow(tri, LM) } else { p.fill(tri, W) }
@@ -363,4 +364,25 @@ func specialHands(_ p: Pen, _ f: Face, dark: Bool, date: Date) {
             p.shadow(a.s, needle, sh); p.rot(a.s) { p.fill(needle, W) } }
         p.shadow(0, p.ell(4), sh); p.capDisc(4); p.circle(4, stroke: CGColor(gray: 0, alpha: 0.45), sw: 0.3); p.circle(1.2, fill: hex("#888888"))
     }
+}
+
+/// Generic pilot wings (original design, no emblem or letters): swept feathered wings + plain shield, thin aged-gold line.
+func pilotWings(_ p: Pen) {
+    let wing = CGMutablePath()
+    func pt(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: x, y: y) }
+    wing.move(to: pt(3.2, -33.5)); wing.addCurve(to: pt(25, -28.5), control1: pt(9, -37), control2: pt(17, -35.5)); wing.addLine(to: pt(20, -29.2))
+    wing.addQuadCurve(to: pt(16.5, -29.6), control: pt(18.5, -27.6)); wing.addQuadCurve(to: pt(12.5, -29.8), control: pt(14.5, -27.4))
+    wing.addQuadCurve(to: pt(8.5, -30), control: pt(10.5, -27.6)); wing.addQuadCurve(to: pt(4, -29.8), control: pt(6.5, -28)); wing.closeSubpath()
+    wing.move(to: pt(5, -32)); wing.addCurve(to: pt(21, -29.8), control1: pt(10, -34.2), control2: pt(15, -33.4))
+    wing.move(to: pt(5, -31)); wing.addCurve(to: pt(17, -30.2), control1: pt(9, -32), control2: pt(13, -31.6))
+    let shield = CGMutablePath()
+    shield.move(to: pt(-3.4, -35)); shield.addLine(to: pt(3.4, -35)); shield.addLine(to: pt(3.4, -31.5))
+    shield.addQuadCurve(to: pt(0, -26.6), control: pt(3.4, -28)); shield.addQuadCurve(to: pt(-3.4, -31.5), control: pt(-3.4, -28)); shield.closeSubpath()
+    let inner = CGMutablePath(); inner.move(to: pt(-2.4, -34)); inner.addLine(to: pt(2.4, -34)); inner.addLine(to: pt(2.4, -31.6)); inner.addQuadCurve(to: pt(0, -28), control: pt(2.4, -29.1))
+    let col = hexA("#b39a68", 0.8), c = p.c
+    c.saveGState(); c.setLineJoin(.round)
+    p.stroke(wing, col, 0.35)
+    var m = CGAffineTransform(scaleX: -1, y: 1); if let l = wing.copy(using: &m) { p.stroke(l, col, 0.35) }
+    p.fill(shield, hex("#0c0c0d")); p.stroke(shield, col, 0.35); p.stroke(inner, col, 0.35)
+    c.restoreGState()
 }

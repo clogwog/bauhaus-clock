@@ -1,5 +1,9 @@
 # Bauhaus Clock
 
+<p align="center">
+<img alt="Bauhaus clock on the Cream dial" src="screenshots/hero.png" width="560">
+</p>
+
 A minimal Bauhaus-style analogue clock in two forms:
 
 - **Web clock** (`web/index.html`): one self-contained offline HTML file (SVG, embedded font, no network).

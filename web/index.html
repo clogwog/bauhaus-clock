@@ -50,7 +50,7 @@ select,input[type=range]{width:100%;font:inherit}
  <a id="src" href="https://github.com/clogwog/bauhaus-clock" target="_blank" rel="noopener" data-i="src">Source on GitHub · includes a macOS screensaver</a>
 </div>
 <script>
-const DIALS={White:['#ffffff','#111','#cfcfcf','#e8452c'],Turquoise:['#d5efef','#10302f','#9fc9c8','#e8452c'],Glacier:['#e3edf2','#14232b','#b3c6cf','#e8452c'],Ocean:['#1f4e6b','#f2f5f7','#5f88a0','#ffb02e'],Tennis:['#dfe86a','#1d2108','#b2ba3c','#1f5fd1'],'Signal Blue':['#1e5bd6','#fff','#6c95e6','#ffcf2e'],Salmon:['#f6a48f','#2a120c','#e07f69','#fff'],Yellow:['#f7d33a','#1d1700','#d4ad18','#e8452c'],Beige:['#ece3d3','#2b241a','#c9bca6','#e8452c'],Pistachio:['#cfe3c0','#18240f','#a3be8f','#e8452c'],Lavender:['#d9d2f0','#1c1630','#ada3d4','#e8452c'],Rose:['#f4cfd6','#2c1218','#d9a2ad','#c8243c'],'Sky Blue':['#bfe0f6','#0e2433','#8dbfe0','#e8452c'],Cream:['#f7f1e1','#29241a','#d8cfb6','#e8452c'],Slate:['#3b4248','#eef0f2','#6b747c','#ff8a3d'],Noir:['#1b1b1b','#f2f2f2','#3c3c3c','#ff5a36']};
+const DIALS={White:['#ffffff','#111','#cfcfcf','#e8452c'],Turquoise:['#d5efef','#10302f','#9fc9c8','#e8452c'],Glacier:['#e3edf2','#14232b','#b3c6cf','#e8452c'],Ocean:['#1f4e6b','#f2f5f7','#5f88a0','#ffb02e'],Tennis:['#dfe86a','#1d2108','#b2ba3c','#1f5fd1'],'Signal Blue':['#1e5bd6','#fff','#6c95e6','#ffcf2e'],Salmon:['#f6a48f','#2a120c','#e07f69','#fff'],Yellow:['#f7d33a','#1d1700','#d4ad18','#e8452c'],Beige:['#ece3d3','#2b241a','#c9bca6','#e8452c'],Pistachio:['#cfe3c0','#18240f','#a3be8f','#e8452c'],Lavender:['#d9d2f0','#1c1630','#ada3d4','#e8452c'],Rose:['#f4cfd6','#2c1218','#d9a2ad','#c8243c'],'Sky Blue':['#bfe0f6','#0e2433','#8dbfe0','#e8452c'],Cream:['#f7f1e1','#29241a','#d8cfb6','#e8452c'],Slate:['#3b4248','#eef0f2','#6b747c','#ff8a3d'],Noir:['#1b1b1b','#f2f2f2','#3c3c3c','#ff5a36'],Speedmaster:['#1a1b1c','#f2f2f2','#d9e4c4','#f2f2f2']};
 const L={en:['English','Dial','Movement','Style','Clocks','Second time zone','Size','Options','Seconds hand','Numerals','Night dimming','Burn-in protection','System font','Language','Quartz','Mechanical','Digital','Classic','Compact','One','Two'],
 fr:['Français','Cadran','Mouvement','Style','Horloges','Second fuseau','Taille','Options','Trotteuse','Chiffres','Atténuation nocturne','Anti-marquage','Police système','Langue','Quartz','Mécanique','Numérique','Classique','Compact','Une','Deux'],
 de:['Deutsch','Zifferblatt','Werk','Stil','Uhren','Zweite Zeitzone','Größe','Optionen','Sekundenzeiger','Ziffern','Nachtdimmung','Einbrennschutz','Systemschrift','Sprache','Quarz','Mechanisch','Digital','Klassisch','Kompakt','Eine','Zwei'],
@@ -69,6 +69,7 @@ const save=()=>localStorage.setItem('bauhausClock',JSON.stringify(S));
 const NS='http://www.w3.org/2000/svg';
 function lum(h){h=h.replace('#','');if(h.length==3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return(0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255}
 function face(){const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','-100 -100 200 200');
+ if(S.dial==='Speedmaster'&&!S.lume){s.innerHTML=speedFace(S.count==2);return s}
  const LU=S.lume,[bg,ink,idx,sec0]=LU?['#020405','#1a5560','#2ee6f0','#1f8f99']:DIALS[S.dial],light=!LU&&lum(bg)>0.55,compact=S.layout==='Compact';
  // Subtle matte style (reference photo): pale pill bars with a wide soft recessed groove, slim rounded hands.
  const edge=LU?'#1c2a30':light?'rgba(0,0,0,.28)':'rgba(0,0,0,.35)',so=LU?0:light?.35:.6;
@@ -107,6 +108,52 @@ function face(){const s=document.createElementNS(NS,'svg');s.setAttribute('viewB
  h+=`<circle r="5.4" transform="${SD}" fill="${shC}"${MB}/>
   ${LU?'<circle r="5.4" fill="#06090a" stroke="#1c2a30" stroke-width=".5"/><circle r="2.4" fill="none" stroke="#15343a" stroke-width=".4"/>':`<circle r="5.4" fill="url(#pc)" stroke="rgba(0,0,0,.35)" stroke-width=".3"/><circle r="3.9" fill="#d8d8d8" stroke="rgba(0,0,0,.25)" stroke-width=".3"/><circle r="2.3" fill="url(#pc)"/><circle r="1" fill="#8d8d8d"/>`}`;
  s.innerHTML=h;return s}
+
+// Speedmaster-inspired chronograph dial (generic; no trademarks). simple=true for dual-clock: simplified subdials.
+function speedFace(simple){const P=(r,a)=>[(Math.sin(a*Math.PI/180)*r).toFixed(2),(-Math.cos(a*Math.PI/180)*r).toFixed(2)];
+ const W='#f2f2f2',LM='#d9e4c4',SD='translate(-1.2 1.8)',MB=' style="mix-blend-mode:multiply"',shC='rgba(0,0,0,.6)';
+ let h=`<defs><radialGradient id="spd" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#2a2b2d"/><stop offset="1" stop-color="#151617"/></radialGradient>
+ <radialGradient id="spb" r="50%"><stop offset=".86" stop-color="#232425"/><stop offset=".93" stop-color="#121313"/><stop offset="1" stop-color="#2b2c2d"/></radialGradient>
+ <radialGradient id="pc" cx="42%" cy="38%" r="70%"><stop offset="0" stop-color="#f0f0f0"/><stop offset="1" stop-color="#9c9c9c"/></radialGradient>
+ </defs>`;
+ // bezel
+ h+=`<circle r="99.5" fill="#bdbdbd"/><circle r="98.6" fill="url(#spb)"/><circle r="85.6" fill="#0c0c0d"/><circle r="85" fill="url(#spd)"/>`;
+ const font=`font-family="'Helvetica Neue',Arial,sans-serif"`;
+ h+=`<g ${font} font-size="4.7" fill="${W}" text-anchor="middle">`;
+ const lab=[500,400,350,300,275,250,225,200,180,160,150,140,130,120,110,100,90,85,80,75,70,65,60];
+ for(const v of lab){const a=3600/v*6;const[x,y]=P(91.2,a);h+=`<text x="0" y="0" transform="translate(${x} ${y}) rotate(${a>100&&a<260?a+180:a}) translate(0 1.7)">${v}</text>`}
+ h+='</g><g stroke="'+W+'" stroke-width=".35">';
+ for(let v=500;v>=60;v-=v>200?25:v>100?5:v>80?2.5:1){const a=3600/v*6;if(a>358)continue;const big=lab.includes(v);const[x1,y1]=P(85.8,a),[x2,y2]=P(big?88.2:87.2,a);h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`}
+ h+='</g>';
+ // TACHYMETRE along the arc 0..43° (before 500)
+ h+=`<path id="tp" d="M${P(91.9,2).join(' ')} A91.9 91.9 0 0 1 ${P(91.9,40).join(' ')}" fill="none"/><text ${font} font-size="4.4" fill="${W}" letter-spacing=".8"><textPath href="#tp" startOffset="50%" text-anchor="middle" dominant-baseline="middle">TACHYMÈTRE</textPath></text>`;
+ // minute track with fifths of a second
+ h+='<g stroke="'+W+'">';for(let i=0;i<300;i++){const a=i*1.2,m=i%5===0;const[x1,y1]=P(84,a),[x2,y2]=P(m?78.6:81.6,a);h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="${m?.55:.25}" opacity="${m?1:.8}"/>`}h+='</g>';
+ // lume batons; skip 3/6/9 positions where subdials sit? (reference keeps short batons there)
+ for(let i=0;i<12;i++){const a=i*30;if(i===0){h+=`<rect x="-1.15" y="-76" width="2.3" height="13" rx=".6" fill="${LM}" stroke="#8f9a7e" stroke-width=".2"/><circle cx="-3.6" cy="-64.8" r="1.25" fill="${LM}"/><circle cx="3.6" cy="-64.8" r="1.25" fill="${LM}"/>`;continue}
+  const short=i%3===0;h+=`<rect x="-1.15" y="-76" width="2.3" height="${short?8:12}" rx=".6" fill="${LM}" stroke="#8f9a7e" stroke-width=".2" transform="rotate(${a})"/>`}
+ h+=`<text y="-40" ${font} font-size="4.2" letter-spacing="1.4" fill="${W}" text-anchor="middle" opacity=".9">CHRONOGRAPH</text>`;
+ // subdials
+ const sub=(cx,cy,nums,run)=>{let g=`<g transform="translate(${cx} ${cy})"><circle r="18.5" fill="#111213"/><circle r="18" fill="#191a1b" stroke="#0a0a0a" stroke-width=".5"/>`;
+  if(!simple)for(let r=2;r<18;r+=.8)g+=`<circle r="${r}" fill="none" stroke="#fff" stroke-width=".18" opacity="${r%1.6<.8?.035:.015}"/>`;
+  const n=run?60:nums.length*(simple?1:5);if(!simple||run)for(let i=0;i<n;i++){const a=i*360/n,M=i%(n/nums.length)===0;const[x1,y1]=P(17.4,a),[x2,y2]=P(M?14.6:15.9,a);g+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${W}" stroke-width="${M?.5:.28}"/>`}
+  nums.forEach((t,i)=>{if(t==='')return;const a=i*360/nums.length;const[x,y]=P(10.4,a);g+=`<text x="${x}" y="${(+y+2).toFixed(2)}" ${font} font-size="5.4" font-weight="500" fill="${W}" text-anchor="middle">${t}</text>`});
+  return g+'</g>'};
+ const sh=(len,tail,w)=>`<path d="M${-w} ${tail} L${-w*.6} ${-len} L${w*.6} ${-len} L${w} ${tail} Z" fill="${W}"/><circle r="1.6" fill="${W}"/>`;
+ // seconds at 9 (ticks), 30-min at 3, 12h at 6 (decorative fixed hands)
+ h+=sub(-38,0,['60','','20','','40',''],1)+sub(38,0,['30','','10','','20',''],0)+sub(0,38,['12','3','6','9'],0);
+ const fixed=(cx,cy,a)=>`<g transform="translate(${cx} ${cy}) rotate(${a})"><g transform="${SD}"${MB}><path d="M-.6 3 L-.35 -15 L.35 -15 L.6 3 Z" fill="${shC}"/></g>${sh(15,3,.6)}<circle r=".7" fill="#777"/></g>`;
+ h+=fixed(38,0,24)+fixed(0,38,312);
+ h+=`<g transform="translate(-38 0)"><g transform="${SD}"${MB}><g class="sss"><path d="M-.6 3 L-.35 -15 L.35 -15 L.6 3 Z" fill="${shC}"/><circle r="1.6" fill="${shC}"/></g></g><g class="ss">${sh(15,3,.6)}</g><circle r=".7" fill="#777"/></g>`;
+ // main hands: slim white batons with lume strip
+ const hp=(len,w,tw,tail)=>`M${-w} ${tail} L${-tw} ${-len+2.5} L0 ${-len} L${tw} ${-len+2.5} L${w} ${tail} Z`;
+ const hand=(c,len,w,tw,tail)=>{const d=hp(len,w,tw,tail);return `<g transform="${SD}"${MB}><g class="${c}s"><path d="${d}" fill="${shC}"/></g></g><g class="${c}"><path d="${d}" fill="${W}" stroke="rgba(0,0,0,.35)" stroke-width=".25"/><path d="M-${(tw*.45).toFixed(2)} ${-len*.3} L-${(tw*.4).toFixed(2)} ${-len+5} L${(tw*.4).toFixed(2)} ${-len+5} L${(tw*.45).toFixed(2)} ${-len*.3} Z" fill="${LM}"/></g>`};
+ h+=hand('hh',50,1.9,2.1,8)+hand('mh',76,1.6,1.7,8);
+ const secP=f=>`<path d="M-.5 16 L-.25 -82 L.25 -82 L.5 16 Z" fill="${f}"/><path d="M0 -71 L1.6 -66 L0 -61 L-1.6 -66 Z" fill="${f===W?LM:f}" stroke="${f===W?W:'none'}" stroke-width=".4"/><circle r="2.2" fill="${f}"/>`;
+ const hideS=S.seconds?'':' style="display:none"';
+ h+=`<g transform="${SD}"${hideS}${MB}><g class="shs">${secP(shC)}</g></g><g class="sh"${hideS}>${secP(W)}</g>`;
+ h+=`<circle r="4.2" transform="${SD}" fill="${shC}"${MB}/><circle r="4.2" fill="url(#pc)" stroke="rgba(0,0,0,.4)" stroke-width=".3"/><circle r="2.2" fill="#cfcfcf"/><circle r=".9" fill="#888"/>`;
+ return h}
 function build(){const st=document.getElementById('stage');st.innerHTML='';const n=S.count;st.style.setProperty('--size',(n==2?S.size*0.55:S.size)+'vmin');
  for(let i=0;i<n;i++){const w=document.createElement('div');const c=document.createElement('div');c.className='clock';c.dataset.tz=i?S.tz2:'';c.appendChild(face());w.appendChild(c);
   if(n==2){const p=document.createElement('div');p.className='cap';p.dataset.tz=i?S.tz2:'';const nm=document.createElement('span');nm.textContent=i?S.tz2.split('/').pop().replace(/_/g,' '):Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop().replace(/_/g,' ');p.appendChild(nm);const ap=document.createElement('span');ap.className='ap';p.appendChild(ap);w.appendChild(p)}st.appendChild(w)}}
@@ -118,7 +165,7 @@ function apply(){const [bg,ink,idx,sec]=S.lume?['#020405','#1a5560','#2ee6f0','#
  ['seconds','numerals','night','burnin','sysfont','lume'].forEach(k=>document.getElementById(k).checked=S[k]);
  size.value=S.size;lang.value=S.lang;tz2.value=S.tz2;tz2.style.display=tzrow.style.display=S.count==2?'':'none';build();save()}
 function seg(id,vals,li){const el=document.getElementById(id);el.innerHTML='';vals.forEach((v,i)=>{const b=document.createElement('button');b.textContent=L[S.lang][li[i]];b.className=S[id]==v?'on':'';b.onclick=()=>{S[id]=v;apply()};el.appendChild(b)})}
-Object.keys(DIALS).forEach(n=>{const b=document.createElement('button');b.title=n;b.style.background=DIALS[n][0];b.onclick=()=>{S.dial=n;apply()};dials.appendChild(b)});
+Object.keys(DIALS).forEach(n=>{const b=document.createElement('button');b.title=n;b.style.background=DIALS[n][0];if(n==='Speedmaster')b.style.boxShadow='inset 0 0 0 3px #3a3a3a,inset 0 0 0 4.5px #d9e4c4';b.onclick=()=>{S.dial=n;apply()};dials.appendChild(b)});
 Object.keys(L).forEach(k=>lang.add(new Option(L[k][0],k)));
 ['Europe/London','America/New_York','America/Los_Angeles','Asia/Tokyo','Asia/Shanghai','Asia/Dubai','Europe/Paris','Europe/Berlin','Europe/Amsterdam','Australia/Melbourne','Asia/Singapore','America/Sao_Paulo'].forEach(z=>tz2.add(new Option(z.replace(/_/g,' '),z)));
 ['seconds','numerals','night','burnin','sysfont','lume'].forEach(k=>document.getElementById(k).onchange=e=>{S[k]=e.target.checked;apply()});
@@ -135,6 +182,7 @@ function tick(){document.querySelectorAll('.clock').forEach(c=>{const t=parts(c.
  else if(S.movement==='Mechanical')s=t.s+Math.floor(t.ms/125)/8; // 28,800 bph = 8 beats/sec
  else s=t.s+t.ms/1000;
  const m=t.m+(t.s+t.ms/1000)/60,h=(t.h%12)+m/60;
+ const ss=c.querySelector('.ss');if(ss){const r=`rotate(${t.s*6})`;ss.setAttribute('transform',r);c.querySelector('.sss').setAttribute('transform',r)}
  for(const [k,v] of [['hh',h*30],['mh',m*6],['sh',s*6]]){const r=`rotate(${v})`;c.querySelector('.'+k).setAttribute('transform',r);c.querySelector('.'+k+'s').setAttribute('transform',r)}});
  document.querySelectorAll('.cap').forEach(updAP);
  const hr=new Date().getHours();document.getElementById('stage').style.opacity=S.night&&(hr>=22||hr<7)?.45:1;

@@ -47,6 +47,7 @@ The screensaver is macOS only (macOS 13 Ventura or later, Apple Silicon and Inte
 - Burn-in drift (on by default).
 - Settings remembered in the browser.
 - Open settings with the gear, or the `s` or `,` keys. Escape, or a click outside the panel, closes it. The panel scrolls on a phone.
+- A big left or right swipe, or mouse drag, cycles through all 19 faces, Lume off and then on for each, and a toast shows the face name. Swiping does not change the movement.
 - One self-contained offline HTML file.
 
 ### Screensaver

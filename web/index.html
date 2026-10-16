@@ -51,7 +51,7 @@ select,input[type=range]{width:100%;font:inherit}
  <a id="src" href="https://github.com/clogwog/bauhaus-clock" target="_blank" rel="noopener" data-i="src">Source on GitHub · includes a macOS screensaver</a>
 </div>
 <script>
-const DIALS={White:['#ffffff','#111','#cfcfcf','#e8452c'],Turquoise:['#d5efef','#10302f','#9fc9c8','#e8452c'],Glacier:['#e3edf2','#14232b','#b3c6cf','#e8452c'],Ocean:['#1f4e6b','#f2f5f7','#5f88a0','#ffb02e'],Tennis:['#dfe86a','#1d2108','#b2ba3c','#1f5fd1'],'Signal Blue':['#1e5bd6','#fff','#6c95e6','#ffcf2e'],Salmon:['#f6a48f','#2a120c','#e07f69','#fff'],Yellow:['#f7d33a','#1d1700','#d4ad18','#e8452c'],Beige:['#ece3d3','#2b241a','#c9bca6','#e8452c'],Pistachio:['#cfe3c0','#18240f','#a3be8f','#e8452c'],Lavender:['#d9d2f0','#1c1630','#ada3d4','#e8452c'],Rose:['#f4cfd6','#2c1218','#d9a2ad','#c8243c'],'Sky Blue':['#bfe0f6','#0e2433','#8dbfe0','#e8452c'],Cream:['#f7f1e1','#29241a','#d8cfb6','#e8452c'],Slate:['#3b4248','#eef0f2','#6b747c','#ff8a3d'],Noir:['#1b1b1b','#f2f2f2','#3c3c3c','#ff5a36'],Chronograph:['#1a1b1c','#f2f2f2','#d9e4c4','#f2f2f2']};
+const DIALS={White:['#ffffff','#111','#cfcfcf','#e8452c'],Turquoise:['#d5efef','#10302f','#9fc9c8','#e8452c'],Glacier:['#e3edf2','#14232b','#b3c6cf','#e8452c'],Ocean:['#1f4e6b','#f2f5f7','#5f88a0','#ffb02e'],Tennis:['#dfe86a','#1d2108','#b2ba3c','#1f5fd1'],'Signal Blue':['#1e5bd6','#fff','#6c95e6','#ffcf2e'],Salmon:['#f6a48f','#2a120c','#e07f69','#fff'],Yellow:['#f7d33a','#1d1700','#d4ad18','#e8452c'],Beige:['#ece3d3','#2b241a','#c9bca6','#e8452c'],Pistachio:['#cfe3c0','#18240f','#a3be8f','#e8452c'],Lavender:['#d9d2f0','#1c1630','#ada3d4','#e8452c'],Rose:['#f4cfd6','#2c1218','#d9a2ad','#c8243c'],'Sky Blue':['#bfe0f6','#0e2433','#8dbfe0','#e8452c'],Cream:['#f7f1e1','#29241a','#d8cfb6','#e8452c'],Slate:['#3b4248','#eef0f2','#6b747c','#ff8a3d'],Noir:['#1b1b1b','#f2f2f2','#3c3c3c','#ff5a36'],Diver:['#121a2b','#f2f2f2','#d9e4c4','#f2f2f2'],Chronograph:['#1a1b1c','#f2f2f2','#d9e4c4','#f2f2f2']};
 const L={en:['English','Dial','Movement','Style','Clocks','Second time zone','Size','Options','Seconds hand','Numerals','Night dimming','Burn-in protection','System font','Language','Quartz','Mechanical','Digital','Classic','Compact','One','Two'],
 fr:['Français','Cadran','Mouvement','Style','Horloges','Second fuseau','Taille','Options','Trotteuse','Chiffres','Atténuation nocturne','Anti-marquage','Police système','Langue','Quartz','Mécanique','Numérique','Classique','Compact','Une','Deux'],
 de:['Deutsch','Zifferblatt','Werk','Stil','Uhren','Zweite Zeitzone','Größe','Optionen','Sekundenzeiger','Ziffern','Nachtdimmung','Einbrennschutz','Systemschrift','Sprache','Quarz','Mechanisch','Digital','Klassisch','Kompakt','Eine','Zwei'],
@@ -70,6 +70,7 @@ const save=()=>localStorage.setItem('bauhausClock',JSON.stringify(S));
 const NS='http://www.w3.org/2000/svg';
 function lum(h){h=h.replace('#','');if(h.length==3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return(0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255}
 function face(){const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','-100 -100 200 200');
+ if(S.dial==='Diver'){s.innerHTML=diverFace(S.count==2,S.lume);return s}
  if(S.dial==='Chronograph'){s.innerHTML=S.lume?chronoDark():speedFace(S.count==2);return s}
  const LU=S.lume,[bg,ink,idx,sec0]=LU?['#020405','#1a5560','#2ee6f0','#1f8f99']:DIALS[S.dial],light=!LU&&lum(bg)>0.55,compact=S.layout==='Compact';
  // Subtle matte style (reference photo): pale pill bars with a wide soft recessed groove, slim rounded hands.
@@ -167,6 +168,52 @@ function chronoDark(){const G='#cfe8b0',SD='',f='filter="url(#cg)"';
  const hideS=S.seconds?'':' style="display:none"';
  h+=`<g class="shs"></g><g class="sh"${hideS}><path d="M-.4 16 L-.2 -82 L.2 -82 L.4 16 Z" fill="#0b0c0c" opacity=".6"/><path d="M0 -71 L1.6 -66 L0 -61 L-1.6 -66 Z" fill="${G}" ${f}/></g>`;
  return h}
+
+// Diver (generic 300m dive watch, no trademarks). dark=true: only lume glows.
+function diverFace(simple,dark){const P=(r,a)=>[+(Math.sin(a*Math.PI/180)*r).toFixed(2),+(-Math.cos(a*Math.PI/180)*r).toFixed(2)];
+ const W='#f4f4f4',LM=dark?'#cfe8b0':'#dfe9c8',SD='translate(-1.2 1.8)',MB=' style="mix-blend-mode:multiply"',shC=dark?'rgba(0,0,0,0)':'rgba(0,0,0,.6)';
+ const lf=dark?' filter="url(#dg)"':'',ring=dark?'none':W,font=`font-family="'Helvetica Neue',Arial,sans-serif"`;
+ let h=`<defs><radialGradient id="dvd" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#1f2c4a"/><stop offset="1" stop-color="#0e1526"/></radialGradient>
+ <linearGradient id="dvb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c4aa0"/><stop offset="1" stop-color="#1a2f72"/></linearGradient>
+ <radialGradient id="dvc" r="50%"><stop offset=".9" stop-color="#8e8e8e"/><stop offset=".95" stop-color="#e8e8e8"/><stop offset="1" stop-color="#9a9a9a"/></radialGradient>
+ <radialGradient id="pc" cx="42%" cy="38%" r="70%"><stop offset="0" stop-color="#f0f0f0"/><stop offset="1" stop-color="#9c9c9c"/></radialGradient>
+ <pattern id="dvw" width="8" height="4.2" patternUnits="userSpaceOnUse"><path d="M0 2.1 Q2 .6 4 2.1 T8 2.1" fill="none" stroke="#000" stroke-width=".9" opacity=".28"/><path d="M0 2.9 Q2 1.4 4 2.9 T8 2.9" fill="none" stroke="#5f7bb8" stroke-width=".35" opacity=".18"/></pattern>
+ <filter id="dg" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur in="SourceGraphic" stdDeviation="1.6" result="b"/><feGaussianBlur in="SourceGraphic" stdDeviation=".5" result="c"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+ if(dark)h+=`<circle r="99.5" fill="#05070b"/><circle r="80" fill="#02040a"/>`;
+ else{h+=`<circle r="99.5" fill="url(#dvc)"/><circle r="97" fill="url(#dvb)" stroke="#0d1838" stroke-width=".6"/><circle r="80.4" fill="#0a0f1c"/><circle r="80" fill="url(#dvd)"/>`;
+  if(!simple)h+=`<circle r="80" fill="url(#dvw)"/>`;
+  // bezel: dots each minute 1..14, bars every 5, numerals every 10
+  h+=`<g fill="${W}">`;for(let m=1;m<60;m++){const a=m*6;if(m%5===0){if(m%10)h+=`<rect x="-1.1" y="-95" width="2.2" height="9" rx=".4" transform="rotate(${a})"/>`}else if(m<15){const[x,y]=P(89,a);h+=`<circle cx="${x}" cy="${y}" r=".9"/>`}}
+  for(const v of [10,20,30,40,50]){const a=v*6,[x,y]=P(88.6,a),rot=v===30?0:a;h+=`<text transform="translate(${x} ${y}) rotate(${rot}) translate(0 3.6)" ${font} font-size="10.5" font-weight="700" text-anchor="middle">${v}</text>`}
+  h+=`<path d="M-5.6 -96 L5.6 -96 L0 -85.6 Z" stroke="#ccc" stroke-width=".3"/></g>`;
+  h+=`<g stroke="${W}">`;for(let i=0;i<60;i++){if(i%5===0)continue;const[x1,y1]=P(79,i*6),[x2,y2]=P(75.5,i*6);h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width=".45"/>`}h+='</g>';
+  h+=`<g fill="${W}" ${font} text-anchor="middle"><text y="33" font-size="4" letter-spacing=".5">PROFESSIONAL</text><text y="39.5" font-size="5">300m / 1000ft</text></g>`;
+  // date window at 3
+  const d=new Date().getDate();h+=`<rect x="46" y="-5.2" width="13" height="10.4" fill="#fafafa" stroke="#bbb" stroke-width=".6"/><text x="52.5" y="3.4" ${font} font-size="8" font-weight="500" fill="#111" text-anchor="middle" class="dvdate">${d}</text>`}
+ // bezel pip (glows in dark)
+ h+=`<circle cy="-92.6" r="1.9" fill="${LM}" stroke="${dark?'none':'#999'}" stroke-width=".4"${lf}/>`;
+ // lume markers with thin white surround
+ const mk=(el)=>`<g fill="${LM}" stroke="${ring}" stroke-width=".7"${lf}>${el}</g>`;let m='';
+ for(let i=0;i<12;i++){const a=i*30;if(i===0)m+=`<rect x="-5" y="-75" width="3.6" height="13" rx=".4"/><rect x="1.4" y="-75" width="3.6" height="13" rx=".4"/>`;
+  else if(i===3)m+=`<rect x="-1.8" y="-75" width="3.6" height="9" rx=".4" transform="rotate(90)"/>`;
+  else if(i%3===0)m+=`<rect x="-1.8" y="-75" width="3.6" height="13" rx=".4" transform="rotate(${a})"/>`;
+  else{const[x,y]=P(69,a);m+=`<circle cx="${x}" cy="${y}" r="4.6"/>`}}
+ h+=mk(m);
+ // skeleton hands
+ const sk=(c,len,w,tail,tip)=>{const R=tip==='round';
+  const shape=R?`M-1 6 L-1 ${-len*0.3} L-2.6 ${-len*0.34} L-2.6 ${-len+8.6} A4.4 4.4 0 1 1 2.6 ${-len+8.6} L2.6 ${-len*0.34} L1 ${-len*0.3} L1 6 Z`
+   :`M-1 6 L-1 ${-len*0.25} L${-w} ${-len*0.3} L${-w} ${-len+9} L0 ${-len} L${w} ${-len+9} L${w} ${-len*0.3} L1 ${-len*0.25} L1 6 Z`;
+  const lume=R?`<circle cy="${-len+5.3}" r="2.9" fill="${LM}"${lf}/>`:`<path d="M0 ${-len+2.2} L${w-1} ${-len+8.4} L${-w+1} ${-len+8.4} Z" fill="${LM}"${lf}/>`;
+  const hollow=R?`<rect x="-1.4" y="${-len+9.6}" width="2.8" height="${len*0.66-11}" fill="url(#dvd)"/>`
+   :`<path d="M${-w+1.1} ${-len*0.3+1.5} L${-w+1.1} ${-len+9.6} L${w-1.1} ${-len+9.6} L${w-1.1} ${-len*0.3+1.5} Z" fill="url(#dvd)"/>`;
+  if(dark)return `<g class="${c}s"></g><g class="${c}"><path d="${shape}" fill="#0b0e14" opacity=".5"/>${lume}</g>`;
+  return `<g transform="${SD}"${MB}><g class="${c}s"><path d="${shape}" fill="${shC}"/></g></g><g class="${c}"><path d="${shape}" fill="${W}" stroke="rgba(0,0,0,.35)" stroke-width=".25"/>${hollow}${lume}</g>`};
+ h+=sk('hh',46,3.4,6,'round')+sk('mh',72,3.4,6,'arrow');
+ const secP=f=>`<path d="M-.45 18 L-.22 -78 L.22 -78 L.45 18 Z" fill="${f}"/>${f===W?'<path d="M-.24 -78 L-.2 -66 L.2 -66 L.24 -78 Z" fill="#e3261f"/>':''}<circle cy="-60" r="2.4" fill="${f===W?LM:f}" stroke="${f===W?W:'none'}" stroke-width=".6"/><circle r="2.2" fill="${f}"/>`;
+ const hideS=S.seconds?'':' style="display:none"';
+ if(dark)h+=`<g class="shs"></g><g class="sh"${hideS}><circle cy="-60" r="2.2" fill="${LM}"${lf}/></g>`;
+ else h+=`<g transform="${SD}"${hideS}${MB}><g class="shs">${secP(shC)}</g></g><g class="sh"${hideS}>${secP(W)}</g><circle r="3.8" transform="${SD}" fill="${shC}"${MB}/><circle r="3.8" fill="url(#pc)" stroke="rgba(0,0,0,.4)" stroke-width=".3"/><circle r="1.1" fill="#888"/>`;
+ return h}
 function build(){const st=document.getElementById('stage');st.innerHTML='';const n=S.count;st.style.setProperty('--size',(n==2?S.size*0.55:S.size)+'vmin');
  for(let i=0;i<n;i++){const w=document.createElement('div');const c=document.createElement('div');c.className='clock';c.dataset.tz=i?S.tz2:'';c.appendChild(face());w.appendChild(c);
   if(n==2){const p=document.createElement('div');p.className='cap';p.dataset.tz=i?S.tz2:'';const nm=document.createElement('span');nm.textContent=i?S.tz2.split('/').pop().replace(/_/g,' '):Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop().replace(/_/g,' ');p.appendChild(nm);const ap=document.createElement('span');ap.className='ap';p.appendChild(ap);w.appendChild(p)}st.appendChild(w)}}
@@ -178,7 +225,7 @@ function apply(){const [bg,ink,idx,sec]=S.lume?['#020405','#1a5560','#2ee6f0','#
  ['seconds','numerals','night','burnin','sysfont','lume'].forEach(k=>document.getElementById(k).checked=S[k]);
  size.value=S.size;lang.value=S.lang;tz2.value=S.tz2;tz2.style.display=tzrow.style.display=S.count==2?'':'none';build();save()}
 function seg(id,vals,li){const el=document.getElementById(id);el.innerHTML='';vals.forEach((v,i)=>{const b=document.createElement('button');b.textContent=L[S.lang][li[i]];b.className=S[id]==v?'on':'';b.onclick=()=>{S[id]=v;apply()};el.appendChild(b)})}
-Object.keys(DIALS).forEach(n=>{const b=document.createElement('button');b.title=n;b.style.background=DIALS[n][0];if(n==='Chronograph'){b.style.background='radial-gradient(circle at 30% 50%,#4a4b4d 0 13%,transparent 15%),radial-gradient(circle at 70% 50%,#4a4b4d 0 13%,transparent 15%),radial-gradient(circle at 50% 74%,#4a4b4d 0 13%,transparent 15%),radial-gradient(circle,#1c1d1e 0 66%,#3a3a3a 68% 80%,#bdbdbd 82%)'}b.onclick=()=>{S.dial=n;apply()};dials.appendChild(b)});
+Object.keys(DIALS).forEach(n=>{const b=document.createElement('button');b.title=n;b.style.background=DIALS[n][0];if(n==='Diver'){b.style.background='radial-gradient(circle,#16203a 0 50%,#fff 51% 53%,#1d3a8a 55% 82%,#c4c4c4 84%)'}if(n==='Chronograph'){b.style.background='radial-gradient(circle at 30% 50%,#4a4b4d 0 13%,transparent 15%),radial-gradient(circle at 70% 50%,#4a4b4d 0 13%,transparent 15%),radial-gradient(circle at 50% 74%,#4a4b4d 0 13%,transparent 15%),radial-gradient(circle,#1c1d1e 0 66%,#3a3a3a 68% 80%,#bdbdbd 82%)'}b.onclick=()=>{S.dial=n;apply()};dials.appendChild(b)});
 Object.keys(L).forEach(k=>lang.add(new Option(L[k][0],k)));
 ['Europe/London','America/New_York','America/Los_Angeles','Asia/Tokyo','Asia/Shanghai','Asia/Dubai','Europe/Paris','Europe/Berlin','Europe/Amsterdam','Australia/Melbourne','Asia/Singapore','America/Sao_Paulo'].forEach(z=>tz2.add(new Option(z.replace(/_/g,' '),z)));
 ['seconds','numerals','night','burnin','sysfont','lume'].forEach(k=>document.getElementById(k).onchange=e=>{S[k]=e.target.checked;apply()});
@@ -195,6 +242,7 @@ function tick(){document.querySelectorAll('.clock').forEach(c=>{const t=parts(c.
  else if(S.movement==='Mechanical')s=t.s+Math.floor(t.ms/125)/8; // 28,800 bph = 8 beats/sec
  else s=t.s+t.ms/1000;
  const m=t.m+(t.s+t.ms/1000)/60,h=(t.h%12)+m/60;
+ const dd=c.querySelector('.dvdate');if(dd){const day=String(c.dataset.tz?+new Intl.DateTimeFormat('en-GB',{timeZone:c.dataset.tz,day:'numeric'}).format(new Date()):new Date().getDate());if(dd.textContent!==day)dd.textContent=day}
  const ss=c.querySelector('.ss');if(ss){const r=`rotate(${t.s*6})`;ss.setAttribute('transform',r);c.querySelector('.sss').setAttribute('transform',r)}
  for(const [k,v] of [['hh',h*30],['mh',m*6],['sh',s*6]]){const r=`rotate(${v})`;c.querySelector('.'+k).setAttribute('transform',r);c.querySelector('.'+k+'s').setAttribute('transform',r)}});
  document.querySelectorAll('.cap').forEach(updAP);

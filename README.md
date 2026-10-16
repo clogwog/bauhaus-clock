@@ -19,10 +19,14 @@ The screensaver is macOS only (macOS 13 Ventura or later, Apple Silicon and Inte
 
 ### Web clock
 
-- 17 dial colours (Noir is the default). A caption under the swatches names the selected dial.
+- 18 dial colours (Noir is the default). A caption under the swatches names the selected dial.
 - Chronograph: a black chronograph dial with a tachymètre bezel, lume batons, and three subdials. The seconds subdial at 9 runs; the subdials at 3 and 6 are decorative. With Lume on, the face goes dark and only the green lume batons and hand strips glow.
 
   ![Chronograph dial](screenshots/web-speedmaster.png)
+
+- Diver: a navy wave dial with a blue dive bezel and a lume pip, round lume markers (bars at 12, 3, 6 and 9), skeleton hands, and a red-tipped seconds hand. A date window at 3 shows that clock's own date, including the second time zone in dual-clock mode. With Lume on, the face goes dark and the lume pip, markers, and hand tips glow.
+
+  ![Diver dial](screenshots/web-diver.png)
 - Three movements. Quartz ticks with a slight overshoot, Mechanical steps at eight beats a second, and Digital sweeps the seconds hand smoothly (Digital is the default). Hour and minute hands sweep on every movement.
 - Classic and Compact layouts (Classic is the default; Compact leaves out the minute ticks).
 - 10 languages.

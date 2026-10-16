@@ -17,8 +17,10 @@ let PALETTES: [Palette] = [
  ("Lavender","#d9d2f0","#1c1630","#ada3d4","#e8452c"),("Rose","#f4cfd6","#2c1218","#d9a2ad","#c8243c"),
  ("Sky Blue","#bfe0f6","#0e2433","#8dbfe0","#e8452c"),("Cream","#f7f1e1","#29241a","#d8cfb6","#e8452c"),
  ("Slate","#3b4248","#eef0f2","#6b747c","#ff8a3d"),("Noir","#1b1b1b","#f2f2f2","#3c3c3c","#ff5a36"),
+ ("Pilot","#0d0d0e","#f2f2f2","#e3c99a","#f2f2f2"),("Diver","#121a2b","#f2f2f2","#d9e4c4","#f2f2f2"),("Chronograph","#1a1b1c","#f2f2f2","#d9e4c4","#f2f2f2"),
 ].map { Palette(name: $0.0, dial: hex($0.1), ink: hex($0.2), idx: hex($0.3), sec: hex($0.4)) }
-let NOIR = PALETTES.count - 1
+let NOIR = PALETTES.firstIndex { $0.name == "Noir" }!
+func paletteIndex(_ name: String) -> Int { PALETTES.firstIndex { $0.name == name } ?? NOIR }
 
 // ---- Subtle matte style (Tom's reference photo); svg units, dial radius R = 100 ----
 import CoreText
@@ -190,8 +192,13 @@ func secondPath() -> CGPath {
 }
 func handAngles(_ date: Date) -> (h: CGFloat, m: CGFloat, s: CGFloat) {
     let c = Calendar.current.dateComponents([.hour, .minute, .second, .nanosecond], from: date)
-    let s = Double(c.second!) + Double(c.nanosecond!)/1e9, m = Double(c.minute!) + s/60, h = Double(c.hour! % 12) + m/60
-    return (CGFloat(h*30), CGFloat(m*6), CGFloat(s*6))
+    let sec = Double(c.second!), frac = Double(c.nanosecond!)/1e9, s = sec + frac, m = Double(c.minute!) + s/60, h = Double(c.hour! % 12) + m/60
+    var hs = s   // seconds-hand position per movement (as in the web clock)
+    switch MOVEMENT {
+    case "Quartz": let f = min(frac * 1000 / 120, 1); hs = sec - 1 + (f < 1 ? 1 - pow(1 - f, 3) + sin(f * .pi) * 0.04 : 1)   // tick with slight overshoot
+    case "Mechanical": hs = sec + floor(frac * 8) / 8                                                                       // 28,800 bph
+    default: break }
+    return (CGFloat(h*30), CGFloat(m*6), CGFloat(hs*6))
 }
 private func rot(_ ctx: CGContext, _ deg: CGFloat, _ f: () -> Void) { ctx.saveGState(); ctx.rotate(by: deg * .pi/180); f(); ctx.restoreGState() }
 func numeralPos(_ n: Int) -> CGPoint { let a = CGFloat(n) * .pi / 6; return CGPoint(x: sin(a) * NUM_R, y: -cos(a) * NUM_R) }
@@ -211,13 +218,17 @@ func drawClock(_ ctx: CGContext, center c: CGPoint, k: CGFloat, pal: Palette, da
     let st = style(pal), kk = k * scale
     ctx.saveGState(); ctx.setAlpha(alpha); ctx.setShouldAntialias(true)
     if alpha < 1 { ctx.beginTransparencyLayer(auxiliaryInfo: nil) }
+    if let f = faceFor(pal) {   // special watch faces: cached static layer + live hands
+        drawSpecial(ctx, center: c, k: k, drawK: kk, face: f, date: date)
+        if alpha < 1 { ctx.endTransparencyLayer() }; ctx.restoreGState(); return
+    }
     // dial (device space so the grain stays fine at any size)
     let R = DIAL_R * kk, disc = CGRect(x: c.x - R, y: c.y - R, width: 2*R, height: 2*R)
     ctx.setFillColor(st.dial); ctx.fillEllipse(in: disc)
     if pal.name == "Noir" && !LUME_ACTIVE { ctx.saveGState(); ctx.addEllipse(in: disc); ctx.clip()
         ctx.draw(GRAIN, in: CGRect(x: 0, y: 0, width: 192, height: 192), byTiling: true); ctx.restoreGState() }
     ctx.translateBy(x: c.x, y: c.y); ctx.scaleBy(x: kk, y: -kk)    // sub-pixel origin, y down
-    for i in 0..<60 where i % 5 != 0 { rot(ctx, CGFloat(i*6)) { drawPrim(ctx, .minuteTick, st) } }
+    if !COMPACT { for i in 0..<60 where i % 5 != 0 { rot(ctx, CGFloat(i*6)) { drawPrim(ctx, .minuteTick, st) } } }
     // outer minute numerals intentionally omitted (Tom)
     do {   // markers and numerals sit flat on the dial: no shadow of their own
         for i in 0..<12 { rot(ctx, CGFloat(i*30)) { drawPrim(ctx, .hourBar(quarter: i % 3 == 0), st) } }
@@ -233,7 +244,7 @@ func drawClock(_ ctx: CGContext, center c: CGPoint, k: CGFloat, pal: Palette, da
         if SHADOWS_ON && !LUME_ACTIVE { drawSilhouette(ctx, p, sc) }; ctx.restoreGState()
         if let d = deg { rot(ctx, d) { drawPrim(ctx, p, st) } } else { drawPrim(ctx, p, st) }
     }
-    shadowed(a.h, HOUR); shadowed(a.m, MINUTE); shadowed(a.s, .second); shadowed(nil, .cap)
+    shadowed(a.h, HOUR); shadowed(a.m, MINUTE); if SHOW_SECONDS { shadowed(a.s, .second) }; shadowed(nil, .cap)
     if alpha < 1 { ctx.endTransparencyLayer() }
     ctx.restoreGState()
 }

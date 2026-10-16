@@ -28,7 +28,7 @@ The screensaver is macOS only (macOS 13 Ventura or later, Apple Silicon and Inte
 
   ![Diver dial](screenshots/web-diver.png)
 
-- Pilot: a black dial with a cream slide-rule bezel, gilt hour numerals, and three subdials. The seconds subdial at 9 runs; the subdials at 3 and 6 are decorative. The hands are aged-cream lume batons with a dark outline. With Lume on, the face goes dark and the numerals, 12 o'clock triangle, and hand strips glow a warm yellow-green.
+- Pilot: a black dial with a cream slide-rule bezel (full outer and inner rings, with a log scale and time markings), gilt hour numerals, and three subdials. The seconds subdial at 9 runs; the subdials at 3 and 6 are decorative. The hands are aged-cream lume batons with a dark outline. With Lume on, the face goes dark and the numerals, 12 o'clock triangle, and hand strips glow a warm yellow-green.
 
   ![Pilot dial](screenshots/web-pilot.png)
 - Three movements. Quartz ticks with a slight overshoot, Mechanical steps at eight beats a second, and Digital sweeps the seconds hand smoothly (Digital is the default). Hour and minute hands sweep on every movement.
@@ -51,12 +51,18 @@ The screensaver is macOS only (macOS 13 Ventura or later, Apple Silicon and Inte
 
 ### Screensaver
 
-- Native macOS `.saver` bundle (Core Graphics drawing, no web view).
-- The clock's diameter is two-thirds of the screen height. It drifts at a constant speed (about 30 pixels a second on a 1080p display), in sub-pixel steps, and bounces off the edges.
-- A corner hit, within a few pixels of the corner, makes it explode and respawn in a different dial colour.
-- Night dimming after 3 minutes from 10pm–7am, fading to about a third of full brightness.
-- A Lume option, plus automatic lume at night once that dimming starts. Both are in the Options sheet; automatic night lume is on by default.
-- The same grooved hour bars, slim tapered hands, and crisp top-right shadows (hidden while Lume is on).
+Version 1.15. Native macOS `.saver` bundle (Core Graphics drawing, no web view).
+
+- All 19 dials, including Chronograph, Diver and Pilot. Those three have dark lume views (Chronograph and Diver glow green; Pilot glows a warm yellow-green). The other dials use the cyan lume.
+- Quartz, Mechanical and Digital movements (Digital is the default). Quartz ticks with a slight overshoot, Mechanical steps at eight beats a second, and Digital sweeps the seconds hand.
+- A seconds-hand toggle (on by default). Classic and Compact styles; Compact leaves the minute ticks off the colour dials.
+- Size is 2/3, 1/2, or 1/3 of the screen height (2/3 by default). It drifts at about 30 pixels a second on a 1080p display. Bounce is on by default; turning it off holds the clock in the centre.
+- A corner hit, within a few pixels, explodes the clock (on by default). It then switches to a different dial, which can be turned off.
+- Night dimming after 3 minutes from 10pm–7am, fading to about a third of full brightness (on by default).
+- Options sheet: dial, movement, style, size, seconds hand, lume, automatic night lume, night dimming, bounce, explode, and change dial after an explosion.
+
+  ![All screensaver dials](screensaver/dials-sheet.png)
+
 - Preview thumbnail for System Settings.
 - Universal build for Apple Silicon and Intel.
 - A test harness (`main.swift` must print `ALL PASS`).
@@ -87,7 +93,7 @@ numerals, night mode, burn-in protection, fonts, **Lume (glow)** and language (1
 
 ## Screensaver
 
-Requirements: macOS 13+, Xcode command-line tools.
+Version 1.15. Requirements: macOS 13+, Xcode command-line tools.
 
 ```sh
 cd screensaver
@@ -98,11 +104,9 @@ cd screensaver
 (arm64 + x86_64) `BauhausClock.saver`, ad-hoc signs it, installs it to `~/Library/Screen Savers/`
 and restarts `legacyScreenSaver`. Then pick **Bauhaus Clock** in System Settings → Screen Saver.
 
-**Options…** in System Settings:
-- *Lume: glowing cyan markers and hands*
-- *Turn lume on automatically at night (10pm–7am, after 3 min)* (on by default)
+**Options…** in System Settings: dial, movement (Quartz, Mechanical, Digital), style (Classic, Compact), size (2/3, 1/2, or 1/3 of the screen height), seconds hand, lume, automatic night lume, night dimming (10pm–7am, after 3 min), bounce, explode on a corner hit, and change dial after an explosion.
 
-Files: `Clock.swift` (drawing), `Sim.swift` (bounce/explosion/dimming state machine), `View.swift`
+Files: `Clock.swift` (drawing), `Faces.swift` (Chronograph, Diver and Pilot), `Sim.swift` (bounce/explosion/dimming state machine), `View.swift`
 (ScreenSaverView + options sheet), `main.swift` (tests), `Info.plist`, `ClockNum.ttf` (digit subset of
 Michroma, SIL OFL; used by the web clock's numerals, bundled for the screensaver), thumbnails.
 

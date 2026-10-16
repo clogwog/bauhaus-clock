@@ -5,6 +5,7 @@ screensaver/BauhausClock.saver/
 screensaver/*.png
 !screensaver/thumbnail.png
 !screensaver/thumbnail@2x.png
+!screensaver/dials-sheet.png
 *.o
 .DS_Store
 # never commit credentials

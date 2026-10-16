@@ -164,5 +164,55 @@ check(!ln.lumeActive, "auto lume off again by day")
 ln.autoNightLume = false; for _ in 0..<(5*10) { ln.step(0.1, date: at(23)) }
 check(!ln.lumeActive, "auto lume can be disabled")
 ln.prefLume = true; check(ln.lumeActive, "Lume option forces lume on any time")
+
+// ---- v1.15: all dials, special faces, movements, cache ----
+check(PALETTES.count == 19 && PALETTES[NOIR].name == "Noir", "19 dials (16 colours + Pilot, Diver, Chronograph)")
+do {   // movements: second-hand angle at hh:mm:36.30
+    var dc = DateComponents(); dc.year = 2026; dc.month = 10; dc.day = 16; dc.hour = 10; dc.minute = 9; dc.second = 36; dc.nanosecond = 300_000_000
+    let d = Calendar.current.date(from: dc)!
+    MOVEMENT = "Digital"; let dg = handAngles(d).s; MOVEMENT = "Mechanical"; let me = handAngles(d).s; MOVEMENT = "Quartz"; let qz = handAngles(d).s; MOVEMENT = "Digital"
+    check(abs(dg - 36.3*6) < 0.01 && abs(me - 36.25*6) < 0.01 && abs(qz - 36*6) < 0.01, "movements: digital \(dg), mechanical \(me), quartz \(qz)")
+}
+// contact sheet: every dial, plus lume views
+func tile(_ ctx: CGContext, _ x: CGFloat, _ y: CGFloat, _ pal: Int, _ lume: Bool, _ label: String) {
+    LUME_ACTIVE = lume; defer { LUME_ACTIVE = false }
+    ctx.setFillColor(hex("#202022")); ctx.fill(CGRect(x: x, y: y, width: 420, height: 470))
+    var dc = DateComponents(); dc.year = 2026; dc.month = 10; dc.day = 16; dc.hour = 10; dc.minute = 10; dc.second = 32
+    drawClock(ctx, center: CGPoint(x: x + 210, y: y + 260), k: 1.95, pal: PALETTES[pal], date: Calendar.current.date(from: dc)!)
+    ctx.saveGState(); ctx.translateBy(x: x + 210, y: y + 30); ctx.scaleBy(x: 1, y: -1); Pen(ctx).text(label, 0, 0, size: 22, color: hex("#dddddd")); ctx.restoreGState()
+}
+do {
+    var items: [(Int, Bool, String)] = PALETTES.indices.map { ($0, false, PALETTES[$0].name) }
+    items += [(NOIR, true, "Lume"), (paletteIndex("Pilot"), true, "Pilot · lume"), (paletteIndex("Diver"), true, "Diver · lume"), (paletteIndex("Chronograph"), true, "Chronograph · lume")]
+    let cols = 6, rows = (items.count + cols - 1) / cols, W = cols * 420, H = rows * 470
+    let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: W, pixelsHigh: H, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+    let g = NSGraphicsContext(bitmapImageRep: rep)!, cx = g.cgContext
+    cx.setFillColor(hex("#111111")); cx.fill(CGRect(x: 0, y: 0, width: W, height: H))
+    for (i, it) in items.enumerated() { tile(cx, CGFloat(i % cols * 420), CGFloat(H - (i / cols + 1) * 470), it.0, it.1, it.2) }
+    g.flushGraphics(); try! rep.representation(using: .png, properties: [:])!.write(to: URL(fileURLWithPath: "dials-sheet.png"))
+    // big single renders of the special faces for side-by-side comparison with the web
+    for (n, lume) in [("Pilot", false), ("Diver", false), ("Chronograph", false), ("Pilot", true), ("Diver", true), ("Chronograph", true)] {
+        let r2 = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 1000, pixelsHigh: 1000, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+        let g2 = NSGraphicsContext(bitmapImageRep: r2)!, c2 = g2.cgContext
+        c2.setFillColor(PALETTES[paletteIndex(n)].dial); c2.fill(CGRect(x: 0, y: 0, width: 1000, height: 1000))
+        LUME_ACTIVE = lume
+        var dc = DateComponents(); dc.year = 2026; dc.month = 10; dc.day = 16; dc.hour = 10; dc.minute = 10; dc.second = 32
+        drawClock(c2, center: CGPoint(x: 500, y: 500), k: 3.47, pal: PALETTES[paletteIndex(n)], date: Calendar.current.date(from: dc)!)
+        LUME_ACTIVE = false
+        g2.flushGraphics(); try! r2.representation(using: .png, properties: [:])!.write(to: URL(fileURLWithPath: "saver-\(n.lowercased())\(lume ? "-lume" : "").png"))
+    }
+}
+do {   // perf: Pilot frames reuse the cached static layer
+    let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 1920, pixelsHigh: 1080, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+    let g = NSGraphicsContext(bitmapImageRep: rep)!, cx = g.cgContext
+    let sim = BounceSim(size: S); sim.pal = paletteIndex("Pilot")
+    let before = faceCacheCount(); let t0 = Date()
+    for i in 0..<120 { sim.step(1.0/60, date: day); sim.draw(cx, date: day.addingTimeInterval(Double(i)/60)) }
+    let ms = Date().timeIntervalSince(t0) * 1000 / 120
+    check(faceCacheCount() - before <= 1, "Pilot static layer built once for 120 frames (cache +\(faceCacheCount() - before))")
+    check(ms < 16, String(format: "Pilot frame time %.2f ms at 1080p", ms))
+}
+let kd = BounceSim(size: S); kd.cycleDials = false; kd.pal = paletteIndex("Diver"); kd.respawn(newPalette: true)
+check(kd.pal == paletteIndex("Diver"), "keep-dial option keeps the chosen dial after an explosion")
 print(fails == 0 ? "ALL PASS" : "\(fails) FAILED")
 exit(fails == 0 ? 0 : 1)

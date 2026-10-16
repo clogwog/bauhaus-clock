@@ -6,7 +6,8 @@ struct Particle { var prim: Prim; var pal: Int; var pos: CGPoint; var vel: CGVec
 final class BounceSim {
     enum Phase { case moving, exploding(t: Double), appearing(t: Double) }
     let size: CGSize
-    var radius: CGFloat { size.height / 3 }             // diameter = 2/3 H
+    var sizeDiv: CGFloat = 3                            // radius = H / sizeDiv (3 -> diameter 2/3 H, 4 -> 1/2, 6 -> 1/3)
+    var radius: CGFloat { size.height / sizeDiv }
     var k: CGFloat { radius / DIAL_R }
     var speed: CGFloat { size.height * 30 / 1080 }      // ~30 px/s at 1080p
     var pos: CGPoint = .zero, vel: CGVector = .zero
@@ -24,6 +25,10 @@ final class BounceSim {
     var dimTarget: CGFloat = 1
     var prefLume = false        // user option (Screen Saver Options sheet)
     var autoNightLume = true    // lume switches on automatically when night dimming kicks in
+    var bounce = true           // off: clock stays centred
+    var explodeOn = true        // corner hits explode
+    var cycleDials = true       // explosion brings a different dial (off: keep the chosen dial)
+    var nightDim = true
     var lumeActive: Bool { prefLume || (autoNightLume && dimTarget < 1) }
 
     init(size: CGSize) {
@@ -39,13 +44,13 @@ final class BounceSim {
         var th = rnd(0, 2 * .pi)
         while abs(cos(th)) < 0.3 || abs(sin(th)) < 0.3 { th = rnd(0, 2 * .pi) }
         vel = CGVector(dx: cos(th) * speed, dy: sin(th) * speed)
-        if newPalette { var n = pal; while n == pal { n = Int.random(in: 0..<PALETTES.count) }; pal = n }
+        if newPalette && cycleDials { var n = pal; while n == pal { n = Int.random(in: 0..<PALETTES.count) }; pal = n }
     }
 
     /// Frame-rate independent: dt sub-stepped at 120 Hz; spikes (sleep, stalls) clamped to 0.1 s.
     func step(_ dt: Double, date: Date = Date()) {
         elapsed += dt
-        dimTarget = (elapsed >= Self.dimDelay && Self.isNight(date)) ? Self.dimLevel : 1
+        dimTarget = (nightDim && elapsed >= Self.dimDelay && Self.isNight(date)) ? Self.dimLevel : 1
         let rate = (1 - Self.dimLevel) / CGFloat(Self.dimFade) * CGFloat(min(dt, 0.1))
         brightness = brightness < dimTarget ? min(dimTarget, brightness + rate) : max(dimTarget, brightness - rate)
         var left = min(dt, 0.1)
@@ -54,6 +59,7 @@ final class BounceSim {
     private func sub(_ dt: Double, _ date: Date) {
         switch phase {
         case .moving:
+            if !bounce { pos = CGPoint(x: size.width/2, y: size.height/2); return }
             let r = radius, d = CGFloat(dt)
             pos.x += vel.dx * d; pos.y += vel.dy * d
             var hitX = false, hitY = false
@@ -63,7 +69,7 @@ final class BounceSim {
             if pos.y + r >= size.height { pos.y = 2*(size.height - r) - pos.y; vel.dy = -abs(vel.dy); hitY = true }
             if hitX || hitY {
                 let dx = min(pos.x - r, size.width - r - pos.x), dy = min(pos.y - r, size.height - r - pos.y)
-                if (hitX && hitY) || (hitX && dy <= cornerTol) || (hitY && dx <= cornerTol) { explode(date) }
+                if (hitX && hitY) || (hitX && dy <= cornerTol) || (hitY && dx <= cornerTol) { if explodeOn { explode(date) } }
             }
         case .exploding(let t):
             let g = -size.height * 1.1, d = CGFloat(dt)

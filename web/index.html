@@ -29,11 +29,12 @@ body.nofont{font-family:Georgia,serif}
 .tg:checked{background:#34c759}.tg:before{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.3)}.tg:checked:before{left:18px}
 select,input[type=range]{width:100%;font:inherit}
 #src{display:block;margin:16px -18px -18px;padding:12px 18px;border-top:1px solid rgba(0,0,0,.08);font-size:11px;color:#777;text-decoration:none;text-align:center;letter-spacing:.02em}#src:hover{color:#111}
+#dialname{margin-top:8px;font-size:12px;color:#555;letter-spacing:.02em}#dialname:before{content:'● ';color:#0a84ff;font-size:9px;vertical-align:1px}
 </style></head><body>
 <div id="stage"></div>
 <button id="gear" aria-label="Settings">⚙</button>
 <div id="panel">
- <h3 data-i="dial">Dial</h3><div class="sw" id="dials"></div>
+ <h3 data-i="dial">Dial</h3><div class="sw" id="dials"></div><div id="dialname"></div>
  <h3 data-i="move">Movement</h3><div class="seg" id="movement"></div>
  <h3 data-i="style">Style</h3><div class="seg" id="layout"></div>
  <h3 data-i="clocks">Clocks</h3><div class="seg" id="count"></div>
@@ -50,7 +51,7 @@ select,input[type=range]{width:100%;font:inherit}
  <a id="src" href="https://github.com/clogwog/bauhaus-clock" target="_blank" rel="noopener" data-i="src">Source on GitHub · includes a macOS screensaver</a>
 </div>
 <script>
-const DIALS={White:['#ffffff','#111','#cfcfcf','#e8452c'],Turquoise:['#d5efef','#10302f','#9fc9c8','#e8452c'],Glacier:['#e3edf2','#14232b','#b3c6cf','#e8452c'],Ocean:['#1f4e6b','#f2f5f7','#5f88a0','#ffb02e'],Tennis:['#dfe86a','#1d2108','#b2ba3c','#1f5fd1'],'Signal Blue':['#1e5bd6','#fff','#6c95e6','#ffcf2e'],Salmon:['#f6a48f','#2a120c','#e07f69','#fff'],Yellow:['#f7d33a','#1d1700','#d4ad18','#e8452c'],Beige:['#ece3d3','#2b241a','#c9bca6','#e8452c'],Pistachio:['#cfe3c0','#18240f','#a3be8f','#e8452c'],Lavender:['#d9d2f0','#1c1630','#ada3d4','#e8452c'],Rose:['#f4cfd6','#2c1218','#d9a2ad','#c8243c'],'Sky Blue':['#bfe0f6','#0e2433','#8dbfe0','#e8452c'],Cream:['#f7f1e1','#29241a','#d8cfb6','#e8452c'],Slate:['#3b4248','#eef0f2','#6b747c','#ff8a3d'],Noir:['#1b1b1b','#f2f2f2','#3c3c3c','#ff5a36'],Speedmaster:['#1a1b1c','#f2f2f2','#d9e4c4','#f2f2f2']};
+const DIALS={White:['#ffffff','#111','#cfcfcf','#e8452c'],Turquoise:['#d5efef','#10302f','#9fc9c8','#e8452c'],Glacier:['#e3edf2','#14232b','#b3c6cf','#e8452c'],Ocean:['#1f4e6b','#f2f5f7','#5f88a0','#ffb02e'],Tennis:['#dfe86a','#1d2108','#b2ba3c','#1f5fd1'],'Signal Blue':['#1e5bd6','#fff','#6c95e6','#ffcf2e'],Salmon:['#f6a48f','#2a120c','#e07f69','#fff'],Yellow:['#f7d33a','#1d1700','#d4ad18','#e8452c'],Beige:['#ece3d3','#2b241a','#c9bca6','#e8452c'],Pistachio:['#cfe3c0','#18240f','#a3be8f','#e8452c'],Lavender:['#d9d2f0','#1c1630','#ada3d4','#e8452c'],Rose:['#f4cfd6','#2c1218','#d9a2ad','#c8243c'],'Sky Blue':['#bfe0f6','#0e2433','#8dbfe0','#e8452c'],Cream:['#f7f1e1','#29241a','#d8cfb6','#e8452c'],Slate:['#3b4248','#eef0f2','#6b747c','#ff8a3d'],Noir:['#1b1b1b','#f2f2f2','#3c3c3c','#ff5a36'],Chronograph:['#1a1b1c','#f2f2f2','#d9e4c4','#f2f2f2']};
 const L={en:['English','Dial','Movement','Style','Clocks','Second time zone','Size','Options','Seconds hand','Numerals','Night dimming','Burn-in protection','System font','Language','Quartz','Mechanical','Digital','Classic','Compact','One','Two'],
 fr:['Français','Cadran','Mouvement','Style','Horloges','Second fuseau','Taille','Options','Trotteuse','Chiffres','Atténuation nocturne','Anti-marquage','Police système','Langue','Quartz','Mécanique','Numérique','Classique','Compact','Une','Deux'],
 de:['Deutsch','Zifferblatt','Werk','Stil','Uhren','Zweite Zeitzone','Größe','Optionen','Sekundenzeiger','Ziffern','Nachtdimmung','Einbrennschutz','Systemschrift','Sprache','Quarz','Mechanisch','Digital','Klassisch','Kompakt','Eine','Zwei'],
@@ -64,12 +65,12 @@ ar:['العربية','المينا','الحركة','النمط','الساعات'
 const KEYS=['dial','move','style','clocks','tz2','size','opts','secs','nums','auto','burn','sysf','lang'];
 const DEF={dial:'Noir',movement:'Digital',layout:'Classic',count:1,tz2:'Europe/London',size:70,seconds:true,numerals:true,night:false,burnin:true,sysfont:true,lume:false,lang:'en'};
 const SRC_L={en:'Source on GitHub · includes a macOS screensaver',fr:'Code source sur GitHub · avec un économiseur d’écran macOS',de:'Quellcode auf GitHub · inkl. macOS-Bildschirmschoner',es:'Código en GitHub · incluye salvapantallas para macOS',it:'Sorgente su GitHub · include uno screensaver per macOS',ja:'GitHub でソースを見る · macOS スクリーンセーバー付き',zh:'GitHub 源代码 · 含 macOS 屏幕保护程序',ru:'Исходный код на GitHub · есть заставка для macOS',tr:'GitHub’da kaynak kodu · macOS ekran koruyucusu dahil',ar:'المصدر على GitHub · يتضمن شاشة توقف لنظام macOS'},LUME_L={en:'Lume (glow)',fr:'Luminescence',de:'Leuchtmasse',es:'Luminiscencia',it:'Luminescenza',ja:'夜光',zh:'夜光',ru:'Люминесценция',tr:'Işıma',ar:'إضاءة ليلية'};
-let S=Object.assign({},DEF,JSON.parse(localStorage.getItem('bauhausClock')||'{}'));
+let S=Object.assign({},DEF,JSON.parse(localStorage.getItem('bauhausClock')||'{}'));if(S.dial==='Speedmaster')S.dial='Chronograph';
 const save=()=>localStorage.setItem('bauhausClock',JSON.stringify(S));
 const NS='http://www.w3.org/2000/svg';
 function lum(h){h=h.replace('#','');if(h.length==3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return(0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255}
 function face(){const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','-100 -100 200 200');
- if(S.dial==='Speedmaster'&&!S.lume){s.innerHTML=speedFace(S.count==2);return s}
+ if(S.dial==='Chronograph'){s.innerHTML=S.lume?chronoDark():speedFace(S.count==2);return s}
  const LU=S.lume,[bg,ink,idx,sec0]=LU?['#020405','#1a5560','#2ee6f0','#1f8f99']:DIALS[S.dial],light=!LU&&lum(bg)>0.55,compact=S.layout==='Compact';
  // Subtle matte style (reference photo): pale pill bars with a wide soft recessed groove, slim rounded hands.
  const edge=LU?'#1c2a30':light?'rgba(0,0,0,.28)':'rgba(0,0,0,.35)',so=LU?0:light?.35:.6;
@@ -154,6 +155,18 @@ function speedFace(simple){const P=(r,a)=>[(Math.sin(a*Math.PI/180)*r).toFixed(2
  h+=`<g transform="${SD}"${hideS}${MB}><g class="shs">${secP(shC)}</g></g><g class="sh"${hideS}>${secP(W)}</g>`;
  h+=`<circle r="4.2" transform="${SD}" fill="${shC}"${MB}/><circle r="4.2" fill="url(#pc)" stroke="rgba(0,0,0,.4)" stroke-width=".3"/><circle r="2.2" fill="#cfcfcf"/><circle r=".9" fill="#888"/>`;
  return h}
+
+// Chronograph in the dark: only Super-LumiNova parts glow pale green; everything else near-black.
+function chronoDark(){const G='#cfe8b0',SD='',f='filter="url(#cg)"';
+ let h=`<defs><filter id="cg" x="-300%" y="-100%" width="700%" height="300%"><feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="b"/><feGaussianBlur in="SourceGraphic" stdDeviation=".5" result="c"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+ h+=`<circle r="99.5" fill="#060707"/><circle r="85" fill="#030404"/>`;
+ h+=`<g fill="${G}" ${f}>`;for(let i=0;i<12;i++){if(i===0){h+=`<rect x="-1.15" y="-76" width="2.3" height="13" rx=".6"/><circle cx="-3.6" cy="-64.8" r="1.25"/><circle cx="3.6" cy="-64.8" r="1.25"/>`;continue}
+  h+=`<rect x="-1.15" y="-76" width="2.3" height="${i%3?12:8}" rx=".6" transform="rotate(${i*30})"/>`}h+='</g>';
+ const strip=(c,len,tw)=>`<g class="${c}s"></g><g class="${c}"><path d="M-${tw*1.9} 8 L-${tw} ${-len+2.5} L0 ${-len} L${tw} ${-len+2.5} L${tw*1.9} 8 Z" fill="#0b0c0c" opacity=".6"/><path d="M-${(tw*.45).toFixed(2)} ${-len*.3} L-${(tw*.4).toFixed(2)} ${-len+5} L${(tw*.4).toFixed(2)} ${-len+5} L${(tw*.45).toFixed(2)} ${-len*.3} Z" fill="${G}" ${f}/></g>`;
+ h+=strip('hh',50,1.1)+strip('mh',76,.9);
+ const hideS=S.seconds?'':' style="display:none"';
+ h+=`<g class="shs"></g><g class="sh"${hideS}><path d="M-.4 16 L-.2 -82 L.2 -82 L.4 16 Z" fill="#0b0c0c" opacity=".6"/><path d="M0 -71 L1.6 -66 L0 -61 L-1.6 -66 Z" fill="${G}" ${f}/></g>`;
+ return h}
 function build(){const st=document.getElementById('stage');st.innerHTML='';const n=S.count;st.style.setProperty('--size',(n==2?S.size*0.55:S.size)+'vmin');
  for(let i=0;i<n;i++){const w=document.createElement('div');const c=document.createElement('div');c.className='clock';c.dataset.tz=i?S.tz2:'';c.appendChild(face());w.appendChild(c);
   if(n==2){const p=document.createElement('div');p.className='cap';p.dataset.tz=i?S.tz2:'';const nm=document.createElement('span');nm.textContent=i?S.tz2.split('/').pop().replace(/_/g,' '):Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop().replace(/_/g,' ');p.appendChild(nm);const ap=document.createElement('span');ap.className='ap';p.appendChild(ap);w.appendChild(p)}st.appendChild(w)}}
@@ -161,11 +174,11 @@ function apply(){const [bg,ink,idx,sec]=S.lume?['#020405','#1a5560','#2ee6f0','#
  document.body.classList.toggle('nofont',!S.sysfont);document.body.classList.toggle('lume',S.lume);document.body.classList.toggle('grain',S.dial==='Noir'&&!S.lume);document.documentElement.lang=S.lang;
  const t=L[S.lang];document.querySelectorAll('[data-i]').forEach(e=>e.textContent=e.dataset.i==='lume'?LUME_L[S.lang]:e.dataset.i==='src'?SRC_L[S.lang]:t[KEYS.indexOf(e.dataset.i)+1]);
  seg('movement',['Quartz','Mechanical','Digital'],[14,15,16]);seg('layout',['Classic','Compact'],[17,18]);seg('count',[1,2],[19,20]);
- document.querySelectorAll('#dials button').forEach(b=>b.classList.toggle('on',b.title===S.dial));
+ document.querySelectorAll('#dials button').forEach(b=>b.classList.toggle('on',b.title===S.dial));dialname.textContent=S.dial;
  ['seconds','numerals','night','burnin','sysfont','lume'].forEach(k=>document.getElementById(k).checked=S[k]);
  size.value=S.size;lang.value=S.lang;tz2.value=S.tz2;tz2.style.display=tzrow.style.display=S.count==2?'':'none';build();save()}
 function seg(id,vals,li){const el=document.getElementById(id);el.innerHTML='';vals.forEach((v,i)=>{const b=document.createElement('button');b.textContent=L[S.lang][li[i]];b.className=S[id]==v?'on':'';b.onclick=()=>{S[id]=v;apply()};el.appendChild(b)})}
-Object.keys(DIALS).forEach(n=>{const b=document.createElement('button');b.title=n;b.style.background=DIALS[n][0];if(n==='Speedmaster')b.style.boxShadow='inset 0 0 0 3px #3a3a3a,inset 0 0 0 4.5px #d9e4c4';b.onclick=()=>{S.dial=n;apply()};dials.appendChild(b)});
+Object.keys(DIALS).forEach(n=>{const b=document.createElement('button');b.title=n;b.style.background=DIALS[n][0];if(n==='Chronograph'){b.style.background='radial-gradient(circle at 30% 50%,#4a4b4d 0 13%,transparent 15%),radial-gradient(circle at 70% 50%,#4a4b4d 0 13%,transparent 15%),radial-gradient(circle at 50% 74%,#4a4b4d 0 13%,transparent 15%),radial-gradient(circle,#1c1d1e 0 66%,#3a3a3a 68% 80%,#bdbdbd 82%)'}b.onclick=()=>{S.dial=n;apply()};dials.appendChild(b)});
 Object.keys(L).forEach(k=>lang.add(new Option(L[k][0],k)));
 ['Europe/London','America/New_York','America/Los_Angeles','Asia/Tokyo','Asia/Shanghai','Asia/Dubai','Europe/Paris','Europe/Berlin','Europe/Amsterdam','Australia/Melbourne','Asia/Singapore','America/Sao_Paulo'].forEach(z=>tz2.add(new Option(z.replace(/_/g,' '),z)));
 ['seconds','numerals','night','burnin','sysfont','lume'].forEach(k=>document.getElementById(k).onchange=e=>{S[k]=e.target.checked;apply()});
